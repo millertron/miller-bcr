@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Feather Pen</string>
     <string name="app_description">A photographic business card reader and profile management system</string>
+    <string name="profile_list_button">View Profiles</string>
+    <string name="camera_reader_button">Start Scanning</string>
+    <string name="camera_reader_instructions">Hold the business card in front of the device\'s camera, then start scanning!</string>
 </resources>
