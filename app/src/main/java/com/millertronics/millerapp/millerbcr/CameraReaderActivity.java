@@ -1,7 +1,9 @@
 package com.millertronics.millerapp.millerbcr;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,18 +22,23 @@ import java.io.IOException;
 
 public class CameraReaderActivity extends AppCompatActivity {
 
-    SurfaceView cameraView;
-    CameraSource cameraSource;
-    TextView textView;
-    final int REQUEST_CAMERA_PERMISSION_ID = 1001;
-    final String TAG = "CameraReaderActivity";
+    private SurfaceView cameraView;
+    private CameraSource cameraSource;
+    private TextView textView;
+    private final int REQUEST_CAMERA_PERMISSION_ID = 1001;
+    private final String TAG = "CameraReaderActivity";
+    public static final String TEXT_DATA_KEY = "text_data_key";
+    private final int CAMERA_TIME = 10000;
+    private Handler handler = new Handler();
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults){
         switch (requestCode){
             case REQUEST_CAMERA_PERMISSION_ID:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                            != PackageManager.PERMISSION_GRANTED){
                         ActivityCompat.requestPermissions(CameraReaderActivity.this,
                                 new String[] {Manifest.permission.CAMERA},
                                 REQUEST_CAMERA_PERMISSION_ID);
@@ -44,6 +51,9 @@ public class CameraReaderActivity extends AppCompatActivity {
                     }
 
                 }
+                break;
+            default:
+                break;
         }
     }
 
@@ -54,7 +64,8 @@ public class CameraReaderActivity extends AppCompatActivity {
 
         cameraView = (SurfaceView) findViewById(R.id.surface_view);
         textView = (TextView) findViewById(R.id.text_view);
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext())
+                .build();
         if (!textRecognizer.isOperational()){
             Log.w(TAG, "Text recognizer is not operational!");
         } else {
@@ -67,7 +78,8 @@ public class CameraReaderActivity extends AppCompatActivity {
             cameraView.getHolder().addCallback(new SurfaceHolder.Callback(){
                 @Override
                 public void surfaceCreated(SurfaceHolder surfaceHolder){
-                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(),
+                            Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
                         ActivityCompat.requestPermissions(CameraReaderActivity.this,
                                 new String[] {Manifest.permission.CAMERA},
                                 REQUEST_CAMERA_PERMISSION_ID);
@@ -114,5 +126,14 @@ public class CameraReaderActivity extends AppCompatActivity {
                 }
             });
         }
+        handler.postDelayed(new Runnable(){
+            @Override
+            public void run() {
+                Intent intent = new Intent(CameraReaderActivity.this, MainActivity.class);
+                intent.putExtra(TEXT_DATA_KEY, "Some data");
+                startActivity(intent);
+                finish();
+            }
+        }, CAMERA_TIME);
     }
 }
