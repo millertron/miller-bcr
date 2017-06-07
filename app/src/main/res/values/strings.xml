@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">MillerBCR</string>
+    <string name="app_name">Feather Pen</string>
+    <string name="app_description">A photographic business card reader and profile management system</string>
 </resources>
