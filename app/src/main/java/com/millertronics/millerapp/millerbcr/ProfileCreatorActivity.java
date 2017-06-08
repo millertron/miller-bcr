@@ -5,9 +5,18 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ProfileCreatorActivity extends AppCompatActivity {
 
@@ -25,6 +34,12 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_creator);
+
+        nameInput = (EditText) findViewById(R.id.input_name);
+        jobTitleInput = (EditText) findViewById(R.id.input_job_title);
+        companyInput = (EditText) findViewById(R.id.input_company);
+        telephoneInput = (EditText) findViewById(R.id.input_telephone);
+        emailInput = (EditText) findViewById(R.id.input_email);
 
         if (!generateProfile()){
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -60,12 +75,6 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         }
 
         profileDao = new ProfileDao(this, null);
-
-        nameInput = (EditText) findViewById(R.id.input_name);
-        jobTitleInput = (EditText) findViewById(R.id.input_job_title);
-        companyInput = (EditText) findViewById(R.id.input_company);
-        telephoneInput = (EditText) findViewById(R.id.input_telephone);
-        emailInput = (EditText) findViewById(R.id.input_email);
 
         Button saveButton = (Button) findViewById(R.id.save_button);
         Button rescanButton = (Button) findViewById(R.id.rescan_button);
@@ -192,7 +201,73 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    private boolean generateProfile(){
-        return false;
+    private boolean generateProfile() {
+        ArrayList<String> profileData;
+        try{
+            profileData = getIntent().getStringArrayListExtra(CameraReaderActivity.PROFILE_DATA_KEY);
+        } catch(Exception e){
+            Log.w(ProfileCreatorActivity.class.getName(), Log.getStackTraceString(e));
+            return false;
+        }
+        Map<String, Integer> phoneNumberCandidates = new HashMap<String, Integer>();
+        Map<String, Integer> emailCandidates = new HashMap<String, Integer>();
+        for (String snapshot : profileData){
+            Log.d(ProfileCreatorActivity.class.getName(), snapshot);
+            for (String text : snapshot.split("\n")){
+                selectPhoneNumber(text, phoneNumberCandidates);
+                selectEmail(text, emailCandidates);
+            }
+        }
+        boolean generateProfile = false;
+        String phoneNumber = getBestCandidate(phoneNumberCandidates);
+        if (StringUtils.isNotBlank(phoneNumber)){
+            generateProfile = true;
+            telephoneInput.setText(phoneNumber);
+        }
+        String email = getBestCandidate(emailCandidates);
+        if (StringUtils.isNotBlank(email)){
+            generateProfile = true;
+            emailInput.setText(email);
+        }
+        return generateProfile;
     }
+
+    private void selectPhoneNumber(String text, Map<String, Integer> phoneNumberCandidates) {
+        //At least 6 numbers, allow other characters
+        if (text.matches("/(?:\\d+\\D+){5,}\\d+/")){
+            String trimmed = text.trim();
+            if (phoneNumberCandidates.containsKey(trimmed)){
+                phoneNumberCandidates.put(trimmed, phoneNumberCandidates.get(trimmed)+1);
+            } else {
+                phoneNumberCandidates.put(trimmed, 1);
+            }
+        }
+    }
+    private void selectEmail(String text, Map<String, Integer> emailCandidates) {
+        int atPos = text.indexOf("@");
+        int dotPos = text.lastIndexOf(".");
+        //Very basic check to see if a text COULD BE an email address
+        if (atPos != -1 && dotPos > atPos){
+            String trimmed = text.trim();
+            if (emailCandidates.containsKey(trimmed)){
+                emailCandidates.put(trimmed, emailCandidates.get(trimmed)+1);
+            } else {
+                emailCandidates.put(trimmed, 1);
+            }
+        }
+    }
+
+    private String getBestCandidate(Map<String, Integer> candidates){
+        int maxValue = 0;
+        String bestCandidate ="";
+        for (Map.Entry<String, Integer> candidate : candidates.entrySet()){
+            if (candidate.getValue() > maxValue){
+                maxValue = candidate.getValue();
+                bestCandidate = candidate.getKey();
+            }
+        }
+        candidates.remove(bestCandidate);
+        return bestCandidate;
+    }
+
 }

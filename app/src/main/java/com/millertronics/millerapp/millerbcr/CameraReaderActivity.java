@@ -18,7 +18,11 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CameraReaderActivity extends AppCompatActivity {
 
@@ -27,8 +31,9 @@ public class CameraReaderActivity extends AppCompatActivity {
     private TextView textView;
     private final int REQUEST_CAMERA_PERMISSION_ID = 1001;
     private final String TAG = "CameraReaderActivity";
-    public static final String TEXT_DATA_KEY = "text_data_key";
+    public static final String PROFILE_DATA_KEY = "profile_data_key";
     private final int CAMERA_TIME = 10000;
+    private List<String> profile_data = new ArrayList<String>();
     private Handler handler = new Handler();
 
     @Override
@@ -119,7 +124,11 @@ public class CameraReaderActivity extends AppCompatActivity {
                                 for (int i=0; i<items.size(); i++){
                                     sb.append(items.valueAt(i).getValue()).append("\n");
                                 }
-                                textView.setText(sb.toString());
+                                String capturedString = sb.toString();
+                                textView.setText(capturedString);
+                                if (StringUtils.isNotBlank(capturedString)){
+                                    profile_data.add(capturedString);
+                                }
                             }
                         });
                     }
@@ -130,7 +139,7 @@ public class CameraReaderActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Intent intent = new Intent(CameraReaderActivity.this, ProfileCreatorActivity.class);
-                intent.putExtra(TEXT_DATA_KEY, "Some data");
+                intent.putStringArrayListExtra(PROFILE_DATA_KEY, (ArrayList<String>) profile_data);
                 startActivity(intent);
                 finish();
             }
