@@ -3,6 +3,9 @@
     <string name="app_description">A photographic business card reader and profile management system</string>
 
     <string name="dialog_confirmation">Are you sure?</string>
+    <string name="dialog_success">Success!</string>
+    <string name="dialog_error_message">Unfortunately, something went wrong...</string>
+    <string name="dialog_error">Error!</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
 
@@ -28,4 +31,6 @@
     <string name="profile_creator_confirm_exit">Discard this profile and exit?</string>
     <string name="profile_creator_save_invalid_title">Invalid profile</string>
     <string name="profile_creator_save_invalid_message">A profile requires a name and company. Please try again.</string>
+    <string name="profile_creator_save_success_message">The profile has been successfully saved.</string>
+    <string name="profile_creator_save_success_scan_another">Scan another</string>
 </resources>

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 
 public class Profile {
+    private Integer id;
     private String name;
     private String jobTitle;
     private String company;
@@ -81,4 +82,9 @@ public class Profile {
     public void setCompany(String company) {
         this.company = company;
     }
+
+    public Integer getId() { return id; }
+
+    public void setId(Integer id) { this.id = id; }
+
 }

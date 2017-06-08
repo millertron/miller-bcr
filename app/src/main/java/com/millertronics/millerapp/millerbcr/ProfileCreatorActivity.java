@@ -1,6 +1,5 @@
 package com.millertronics.millerapp.millerbcr;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +18,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     private EditText companyInput;
     private EditText telephoneInput;
     private EditText emailInput;
+
+    private ProfileDao profileDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                     });
             builder.create().show();
         }
+
+        profileDao = new ProfileDao(this, null);
 
         nameInput = (EditText) findViewById(R.id.input_name);
         jobTitleInput = (EditText) findViewById(R.id.input_job_title);
@@ -133,13 +136,18 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                 emailInput.getText().toString()
         );
         if (profile.isValid()){
-            saveProfile(profile);
+            if (saveProfile(profile)) {
+                showSaveSuccessDialog();
+            } else {
+                Utils.displayErrorDialog(this);
+            }
         } else {
             alertInvalidProfile();
         }
     }
 
-    private void saveProfile(Profile profile) {
+    private boolean saveProfile(Profile profile) {
+        return profileDao.insert(profile);
     }
 
     private void alertInvalidProfile() {
@@ -151,6 +159,34 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
+                    }
+                });
+        builder.create().show();
+    }
+
+    private void showSaveSuccessDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.dialog_success);
+        builder.setMessage(R.string.profile_creator_save_success_message);
+        builder.setCancelable(false); //Don't let them touch out!
+        builder.setNegativeButton(R.string.dialog_ok,
+                new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(ProfileCreatorActivity.this,
+                                ProfileListActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+        builder.setPositiveButton(R.string.profile_creator_save_success_scan_another,
+                new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(ProfileCreatorActivity.this,
+                                CameraReaderActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                 });
         builder.create().show();
