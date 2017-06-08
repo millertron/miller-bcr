@@ -17,14 +17,16 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
         </activity>
-        <activity android:name=".CameraReaderActivity"></activity>
+        <activity android:name=".CameraReaderActivity"/>
 
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name=".ProfileCreatorActivity" />
-        <activity android:name=".ProfileListActivity"></activity>
+        <activity android:name=".ProfileCreatorActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+        </activity>
+        <activity android:name=".ProfileListActivity"/>
     </application>
 
 </manifest>

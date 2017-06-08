@@ -1,7 +1,31 @@
 <resources>
     <string name="app_name">Feather Pen</string>
     <string name="app_description">A photographic business card reader and profile management system</string>
+
+    <string name="dialog_confirmation">Are you sure?</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+
     <string name="profile_list_button">View Profiles</string>
+
+
     <string name="camera_reader_button">Start Scanning</string>
     <string name="camera_reader_instructions">Hold the business card in front of the device\'s camera, then start scanning!</string>
+
+    <string name="profile_creator_alert_read_fail">Unable to read details</string>
+    <string name="profile_creator_alert_read_fail_retry">Rescan</string>
+    <string name="profile_creator_alert_read_fail_manual">Enter manually</string>
+    <string name="profile_creator_alert_read_fail_exit">Exit</string>
+    <string name="profile_creator_form_name">Name</string>
+    <string name="profile_creator_form_job_title">Job Title</string>
+    <string name="profile_creator_form_company">Company</string>
+    <string name="profile_creator_form_telephone">Telephone</string>
+    <string name="profile_creator_form_email">Email</string>
+    <string name="profile_creator_button_save_form">Save</string>
+    <string name="profile_creator_button_rescan">Rescan</string>
+    <string name="profile_creator_button_exit">Exit</string>
+    <string name="profile_creator_confirm_rescan">Discard this profile and rescan?</string>
+    <string name="profile_creator_confirm_exit">Discard this profile and exit?</string>
+    <string name="profile_creator_save_invalid_title">Invalid profile</string>
+    <string name="profile_creator_save_invalid_message">A profile requires a name and company. Please try again.</string>
 </resources>
