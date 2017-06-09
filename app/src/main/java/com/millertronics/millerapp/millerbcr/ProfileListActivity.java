@@ -1,5 +1,6 @@
 package com.millertronics.millerapp.millerbcr;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,13 +27,13 @@ public class ProfileListActivity extends AppCompatActivity {
         }else {
             List<String> profileItems = new ArrayList<String>();
             profileData.moveToFirst();
-            do {
+            while (profileData.moveToNext()){
                 StringBuilder sb = new StringBuilder();
                 sb.append(profileData.getString(1))
                         .append(" / ")
                         .append(profileData.getString(2));
                 profileItems.add(sb.toString());
-            } while (profileData.moveToNext());
+            }
             profileData.close();
 
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -46,5 +47,11 @@ public class ProfileListActivity extends AppCompatActivity {
         }
 
 
+    }
+    @Override
+    public void onBackPressed(){
+        Intent intent = new Intent(ProfileListActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

@@ -270,4 +270,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         return bestCandidate;
     }
 
+    @Override
+    public void onBackPressed(){
+        Intent intent = new Intent(ProfileCreatorActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

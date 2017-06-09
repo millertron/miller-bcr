@@ -145,4 +145,11 @@ public class CameraReaderActivity extends AppCompatActivity {
             }
         }, CAMERA_TIME);
     }
+
+    @Override
+    public void onBackPressed(){
+        Intent intent = new Intent(CameraReaderActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }
