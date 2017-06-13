@@ -13,9 +13,11 @@ import android.widget.EditText;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class ProfileCreatorActivity extends AppCompatActivity {
@@ -27,6 +29,15 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     private EditText companyInput;
     private EditText telephoneInput;
     private EditText emailInput;
+    private Button nameCandidatesButton;
+    private Button jobTitleCandidatesButton;
+    private Button companyCandidatesButton;
+    private Button telephoneCandidatesButton;
+    private Button emailCandidatesButton;
+
+    Map<String, Integer> phoneNumberCandidates = new HashMap<String, Integer>();
+    Map<String, Integer> emailCandidates = new HashMap<String, Integer>();
+    List<String> genericCandidates = new ArrayList<String>();
 
     private ProfileDao profileDao;
 
@@ -40,6 +51,12 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         companyInput = (EditText) findViewById(R.id.input_company);
         telephoneInput = (EditText) findViewById(R.id.input_telephone);
         emailInput = (EditText) findViewById(R.id.input_email);
+
+        nameCandidatesButton = (Button) findViewById(R.id.name_candidates_button);
+        jobTitleCandidatesButton = (Button) findViewById(R.id.job_title_candidates_button);
+        companyCandidatesButton = (Button) findViewById(R.id.company_candidates_button);
+        telephoneCandidatesButton = (Button) findViewById(R.id.telephone_candidates_button);
+        emailCandidatesButton = (Button) findViewById(R.id.email_candidates_button);
 
         if (!generateProfile()){
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -71,7 +88,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                             finish();
                         }
                     });
-            builder.create().show();
+            builder.show();
         }
 
         profileDao = new ProfileDao(this, null);
@@ -93,6 +110,32 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         exitButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
                 confirmExit();
+            }
+        });
+
+        nameCandidatesButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                popUpCandidates(genericCandidates, nameInput);
+            }
+        });
+        jobTitleCandidatesButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                popUpCandidates(genericCandidates, jobTitleInput);
+            }
+        });
+        companyCandidatesButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                popUpCandidates(genericCandidates, companyInput);
+            }
+        });
+        telephoneCandidatesButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                popUpCandidates(phoneNumberCandidates.keySet(), telephoneInput);
+            }
+        });
+        emailCandidatesButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                popUpCandidates(emailCandidates.keySet(), emailInput);
             }
         });
     }
@@ -132,7 +175,20 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                         finish();
                     }
                 });
-        builder.create().show();
+        builder.show();
+    }
+
+    private void popUpCandidates(Collection<String> candidates, final EditText input){
+        if (!candidates.isEmpty()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            final CharSequence[] items = candidates.toArray(new CharSequence[candidates.size()]);
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogInteface, int i) {
+                    input.setText(items[i]);
+                }
+            });
+            builder.show();
+        }
     }
 
     private void validateAndCreateProfile(){
@@ -205,17 +261,20 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         ArrayList<String> profileData;
         try{
             profileData = getIntent().getStringArrayListExtra(CameraReaderActivity.PROFILE_DATA_KEY);
-        } catch(Exception e){
+        } catch(Exception e) {
             Log.w(ProfileCreatorActivity.class.getName(), Log.getStackTraceString(e));
             return false;
         }
-        Map<String, Integer> phoneNumberCandidates = new HashMap<String, Integer>();
-        Map<String, Integer> emailCandidates = new HashMap<String, Integer>();
+
         for (String snapshot : profileData){
             Log.d(ProfileCreatorActivity.class.getName(), snapshot);
             for (String text : snapshot.split("\n")){
-                selectPhoneNumber(text, phoneNumberCandidates);
-                selectEmail(text, emailCandidates);
+                boolean selected = false;
+                selected = selectPhoneNumber(text, phoneNumberCandidates)
+                        || selectEmail(text, emailCandidates);
+                if (!selected) {
+                    selectRest(text, genericCandidates);
+                }
             }
         }
         boolean generateProfile = false;
@@ -229,21 +288,66 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             generateProfile = true;
             emailInput.setText(email);
         }
+        for (int i = 0; i < genericCandidates.size(); i++){
+            switch(i){
+                case 0:
+                    nameInput.setText(genericCandidates.get(i));
+                    generateProfile = true;
+                    break;
+                case 1:
+                    jobTitleInput.setText(genericCandidates.get(i));
+                    break;
+                case 2:
+                    companyInput.setText(genericCandidates.get(i));
+                    break;
+                default:
+                    break;
+            }
+        }
+        genericCandidates.addAll(phoneNumberCandidates.keySet());
+        genericCandidates.addAll(emailCandidates.keySet());
         return generateProfile;
     }
 
-    private void selectPhoneNumber(String text, Map<String, Integer> phoneNumberCandidates) {
-        //At least 6 numbers, allow other characters
-        if (text.matches("/(?:\\d+\\D+){5,}\\d+/")){
-            String trimmed = text.trim();
-            if (phoneNumberCandidates.containsKey(trimmed)){
-                phoneNumberCandidates.put(trimmed, phoneNumberCandidates.get(trimmed)+1);
-            } else {
-                phoneNumberCandidates.put(trimmed, 1);
+    private void selectRest(String text, List<String> genericCandidates) {
+        List<String> toFilter = new ArrayList<String>();
+        boolean filter = false;
+        for (String candidate : genericCandidates){
+            if (candidate.contains(text)){
+                filter = true;
+                break;
+            }
+            if (text.contains(candidate)){
+                toFilter.add(candidate);
             }
         }
+        if (!filter){
+            genericCandidates.add(text);
+        }
+        genericCandidates.removeAll(toFilter);
     }
-    private void selectEmail(String text, Map<String, Integer> emailCandidates) {
+
+    private boolean selectPhoneNumber(String text, Map<String, Integer> phoneNumberCandidates) {
+        //At least 6 numbers, allow other characters
+        String trimmed = text.toLowerCase().replaceAll("tel:","").replaceAll("mob:","").trim();
+        if (phoneNumberCandidates.containsKey(trimmed)) {
+            phoneNumberCandidates.put(trimmed, phoneNumberCandidates.get(trimmed) + 1);
+        } else {
+            int numCount = 0;
+
+            for (char c : trimmed.toCharArray()) {
+                if (Character.isDigit(c)) {
+                    numCount++;
+                }
+                if (numCount == 6) {
+                    phoneNumberCandidates.put(trimmed, 1);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private boolean selectEmail(String text, Map<String, Integer> emailCandidates) {
         int atPos = text.indexOf("@");
         int dotPos = text.lastIndexOf(".");
         //Very basic check to see if a text COULD BE an email address
@@ -254,7 +358,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             } else {
                 emailCandidates.put(trimmed, 1);
             }
+            return true;
         }
+        return false;
     }
 
     private String getBestCandidate(Map<String, Integer> candidates){
@@ -266,7 +372,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                 bestCandidate = candidate.getKey();
             }
         }
-        candidates.remove(bestCandidate);
+        //candidates.remove(bestCandidate);
         return bestCandidate;
     }
 

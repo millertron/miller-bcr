@@ -33,4 +33,5 @@
     <string name="profile_creator_save_invalid_message">A profile requires a name and company. Please try again.</string>
     <string name="profile_creator_save_success_message">The profile has been successfully saved.</string>
     <string name="profile_creator_save_success_scan_another">Scan another</string>
+    <string name="profile_creator_select_button">Select</string>
 </resources>
