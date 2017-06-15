@@ -38,6 +38,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     Map<String, Integer> phoneNumberCandidates = new HashMap<String, Integer>();
     Map<String, Integer> emailCandidates = new HashMap<String, Integer>();
     List<String> genericCandidates = new ArrayList<String>();
+    List<String> nameCandidates = new ArrayList<String>();
+    List<String> companyCandidates = new ArrayList<String>();
 
     private ProfileDao profileDao;
 
@@ -115,7 +117,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
         nameCandidatesButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
-                popUpCandidates(genericCandidates, nameInput);
+                popUpCandidates(nameCandidates, nameInput);
             }
         });
         jobTitleCandidatesButton.setOnClickListener(new View.OnClickListener(){
@@ -125,7 +127,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         });
         companyCandidatesButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
-                popUpCandidates(genericCandidates, companyInput);
+                popUpCandidates(companyCandidates, companyInput);
             }
         });
         telephoneCandidatesButton.setOnClickListener(new View.OnClickListener(){
@@ -267,12 +269,11 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         }
 
         for (String snapshot : profileData){
-            Log.d(ProfileCreatorActivity.class.getName(), snapshot);
             for (String text : snapshot.split("\n")){
-                boolean selected = false;
+                int selected = 0;
                 selected = selectPhoneNumber(text, phoneNumberCandidates)
-                        || selectEmail(text, emailCandidates);
-                if (!selected) {
+                        + selectEmail(text, emailCandidates);
+                if (selected == 0) {
                     selectRest(text, genericCandidates);
                 }
             }
@@ -284,26 +285,59 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             telephoneInput.setText(phoneNumber);
         }
         String email = getBestCandidate(emailCandidates);
+
         if (StringUtils.isNotBlank(email)){
             generateProfile = true;
             emailInput.setText(email);
-        }
-        for (int i = 0; i < genericCandidates.size(); i++){
-            switch(i){
-                case 0:
-                    nameInput.setText(genericCandidates.get(i));
-                    generateProfile = true;
-                    break;
-                case 1:
-                    jobTitleInput.setText(genericCandidates.get(i));
-                    break;
-                case 2:
-                    companyInput.setText(genericCandidates.get(i));
-                    break;
-                default:
-                    break;
+            String namePart = email.substring(0, email.indexOf("@"));
+            String companyPart = email.substring(email.indexOf("@")+1, email.length());
+            companyPart = companyPart.substring(0, companyPart.indexOf("."));
+
+            StringBuilder nameBuilder = new StringBuilder();
+            int j = 0;
+            for (String str : namePart.split("\\.")){
+                j++;
+                nameBuilder.append(str.substring(0, 1).toUpperCase());
+                if (str.length() > 1){
+                    nameBuilder.append(str.substring(1));
+                }
+                nameBuilder.append(" ");
             }
+            if (j > 0) {
+                nameCandidates.add(nameBuilder.toString().trim());
+            }
+
+            if (companyPart.length() > 1
+                    && !companyPart.equals("googlemail")
+                    && !companyPart.equals("gmail")
+                    && !companyPart.equals("hotmail")
+                    && !companyPart.equals("live")){
+                companyCandidates.add(companyPart.substring(0, 1).toUpperCase()+companyPart.substring(1));
+                companyCandidates.add(companyPart.toUpperCase());
+                companyCandidates.add(companyPart);
+            }
+
         }
+
+        nameCandidates.addAll(genericCandidates);
+        companyCandidates.addAll(genericCandidates);
+
+        if (!nameCandidates.isEmpty()){
+            nameInput.setText(nameCandidates.get(0));
+            generateProfile = true;
+        }
+        int i = 0;
+        if (!companyCandidates.isEmpty()){
+            if (companyCandidates.get(0).equals(nameCandidates.get(0)) && companyCandidates.size() != 1){
+                i++;
+            }
+            companyInput.setText(companyCandidates.get(i));
+        }
+
+        if (!genericCandidates.isEmpty()){
+            jobTitleInput.setText(genericCandidates.get(0));
+        }
+
         genericCandidates.addAll(phoneNumberCandidates.keySet());
         genericCandidates.addAll(emailCandidates.keySet());
         return generateProfile;
@@ -327,7 +361,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         genericCandidates.removeAll(toFilter);
     }
 
-    private boolean selectPhoneNumber(String text, Map<String, Integer> phoneNumberCandidates) {
+    private int selectPhoneNumber(String text, Map<String, Integer> phoneNumberCandidates) {
         //At least 6 numbers, allow other characters
         String trimmed = text.toLowerCase().replaceAll("tel:","").replaceAll("mob:","").trim();
         if (phoneNumberCandidates.containsKey(trimmed)) {
@@ -341,13 +375,13 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                 }
                 if (numCount == 6) {
                     phoneNumberCandidates.put(trimmed, 1);
-                    return true;
+                    return 1;
                 }
             }
         }
-        return false;
+        return 0;
     }
-    private boolean selectEmail(String text, Map<String, Integer> emailCandidates) {
+    private int selectEmail(String text, Map<String, Integer> emailCandidates) {
         int atPos = text.indexOf("@");
         int dotPos = text.lastIndexOf(".");
         //Very basic check to see if a text COULD BE an email address
@@ -358,9 +392,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             } else {
                 emailCandidates.put(trimmed, 1);
             }
-            return true;
+            return 1;
         }
-        return false;
+        return 0;
     }
 
     private String getBestCandidate(Map<String, Integer> candidates){
