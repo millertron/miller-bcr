@@ -26,8 +26,7 @@ public class ProfileListActivity extends AppCompatActivity {
             Utils.displayErrorDialog(this);
         }else {
             List<String> profileItems = new ArrayList<String>();
-            profileData.moveToFirst();
-            while (profileData.moveToNext()){
+            for(profileData.moveToFirst(); !profileData.isAfterLast(); profileData.moveToNext()){
                 StringBuilder sb = new StringBuilder();
                 sb.append(profileData.getString(1))
                         .append(" / ")
