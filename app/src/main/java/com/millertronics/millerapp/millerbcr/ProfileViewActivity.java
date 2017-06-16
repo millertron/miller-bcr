@@ -30,7 +30,7 @@ public class ProfileViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_view);
 
-        profileDao = new ProfileDao(this, null);
+        profileDao = ProfileDao.getInstance(this);
         profile = loadProfile();
         if (profile == null){
             AlertDialog.Builder builder = new AlertDialog.Builder(this);

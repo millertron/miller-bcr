@@ -93,7 +93,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             builder.show();
         }
 
-        profileDao = new ProfileDao(this, null);
+        profileDao = ProfileDao.getInstance(this);
 
         Button saveButton = (Button) findViewById(R.id.save_button);
         Button rescanButton = (Button) findViewById(R.id.rescan_button);

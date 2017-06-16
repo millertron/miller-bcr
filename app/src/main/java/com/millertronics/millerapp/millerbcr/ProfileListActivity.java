@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -18,7 +19,7 @@ public class ProfileListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_list);
-        profileDao = new ProfileDao(this, null);
+        profileDao = ProfileDao.getInstance(this);
         ListView listView = (ListView) findViewById(R.id.list_view);
 
         Cursor profileData = profileDao.loadDataForMinimalList();
@@ -35,6 +36,7 @@ public class ProfileListActivity extends AppCompatActivity {
                         .append(profileData.getString(0));
                 profileItems.add(sb.toString());
             }
+            Log.d(ProfileListActivity.class.getName(), "Found "+profileItems.size()+" profiles in list");
             profileData.close();
 
             ProfileArrayAdapter adapter = new ProfileArrayAdapter(

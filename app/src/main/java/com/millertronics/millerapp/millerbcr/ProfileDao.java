@@ -23,9 +23,17 @@ public class ProfileDao extends SQLiteOpenHelper {
     private static final String PROFILE_COL_COMPANY = "company";
     private static final String PROFILE_COL_PRIMARY_TEL = "primary_tel";
     private static final String PROFILE_COL_EMAIL = "email";
+    private static ProfileDao mInstance;
 
-    public ProfileDao(Context context, SQLiteDatabase.CursorFactory factory) {
-        super(context, APP_DATABASE, factory, 1, null);
+    private ProfileDao(Context context) {
+        super(context, APP_DATABASE, null, 1);
+    }
+
+    public static ProfileDao getInstance(Context context){
+        if (mInstance == null){
+            mInstance = new ProfileDao(context);
+        }
+        return mInstance;
     }
 
     @Override
@@ -100,7 +108,9 @@ public class ProfileDao extends SQLiteOpenHelper {
                     .append(PROFILE_COL_ID).append(", ")
                     .append(PROFILE_COL_NAME).append(", ")
                     .append(PROFILE_COL_COMPANY)
-                    .append(" from ").append(PROFILE_TABLE).append(";");
+                    .append(" from ").append(PROFILE_TABLE)
+                    .append(" order by ").append(PROFILE_COL_NAME).append(" asc")
+                    .append(";");
             Cursor result =
                     db.rawQuery(queryBuilder.toString(), null);
             return result;
