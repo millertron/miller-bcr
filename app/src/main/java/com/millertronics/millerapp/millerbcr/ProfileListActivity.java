@@ -30,15 +30,16 @@ public class ProfileListActivity extends AppCompatActivity {
                 StringBuilder sb = new StringBuilder();
                 sb.append(profileData.getString(1))
                         .append(" / ")
-                        .append(profileData.getString(2));
+                        .append(profileData.getString(2))
+                        .append(ProfileArrayAdapter.DELIMITER)
+                        .append(profileData.getString(0));
                 profileItems.add(sb.toString());
             }
             profileData.close();
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            ProfileArrayAdapter adapter = new ProfileArrayAdapter(
                     this,
-                    android.R.layout.simple_list_item_1,
-                    profileItems
+                    profileItems.toArray(new String[profileItems.size()])
             );
             listView.setAdapter(adapter);
             adapter.notifyDataSetChanged();

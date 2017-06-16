@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.millertronics.millerapp.millerbcr.ProfileViewActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/label_name"
+            android:text="@string/profile_creator_form_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/text_view_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="40px" />
+        <TextView
+            android:id="@+id/label_job_title"
+            android:text="@string/profile_creator_form_job_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/text_view_job_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="40px" />
+        <TextView
+            android:id="@+id/label_company"
+            android:text="@string/profile_creator_form_company"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/text_view_company"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="40px" />
+        <TextView
+            android:id="@+id/label_telephone"
+            android:text="@string/profile_creator_form_telephone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/text_view_telephone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="40px" />
+        <TextView
+            android:id="@+id/label_email"
+            android:text="@string/profile_creator_form_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/text_view_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="40px" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/return_to_list_button"
+                android:text="@string/profile_viewer_return_to_list_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

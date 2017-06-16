@@ -34,4 +34,6 @@
     <string name="profile_creator_save_success_message">The profile has been successfully saved.</string>
     <string name="profile_creator_save_success_scan_another">Scan another</string>
     <string name="profile_creator_select_button">Select</string>
+
+    <string name="profile_viewer_return_to_list_button">Return to list</string>
 </resources>

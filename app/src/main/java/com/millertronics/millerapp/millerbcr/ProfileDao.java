@@ -109,4 +109,38 @@ public class ProfileDao extends SQLiteOpenHelper {
         }
         return null;
     }
+
+    public Profile load(Integer id){
+        Profile profile = null;
+        if (id != null) {
+            try {
+                SQLiteDatabase db = this.getReadableDatabase();
+                StringBuilder queryBuilder = new StringBuilder();
+                queryBuilder.append("select ")
+                        .append(PROFILE_COL_NAME).append(", ")
+                        .append(PROFILE_COL_JOB_TITLE).append(", ")
+                        .append(PROFILE_COL_COMPANY).append(", ")
+                        .append(PROFILE_COL_PRIMARY_TEL).append(", ")
+                        .append(PROFILE_COL_EMAIL)
+                        .append(" from ").append(PROFILE_TABLE)
+                        .append(" where ").append(PROFILE_COL_ID).append(" = ?")
+                        .append(";");
+                Cursor result =
+                        db.rawQuery(queryBuilder.toString(), new String[]{String.valueOf(id)});
+                result.moveToFirst();
+                profile = new Profile(
+                        result.getString(result.getColumnIndex(PROFILE_COL_NAME)),
+                        result.getString(result.getColumnIndex(PROFILE_COL_JOB_TITLE)),
+                        result.getString(result.getColumnIndex(PROFILE_COL_COMPANY)),
+                        result.getString(result.getColumnIndex(PROFILE_COL_PRIMARY_TEL)),
+                        result.getString(result.getColumnIndex(PROFILE_COL_EMAIL))
+                );
+                profile.setId(id);
+                result.close();
+            } catch (Exception e) {
+                Log.e(TAG, Log.getStackTraceString(e));
+            }
+        }
+        return profile;
+    }
 }
